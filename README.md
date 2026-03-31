@@ -1,15 +1,13 @@
 <p align="center">
-  <h1 align="center">Seldon</h1>
-  <p align="center">
-    <em>Analyzes implementation plans the way Hari Seldon analyzed civilizations — by checking structural assumptions against reality before things go wrong.</em>
-  </p>
-  <p align="center">
-    <a href="#install">Install</a> &bull;
-    <a href="#usage">Usage</a> &bull;
-    <a href="#focus-modes">Focus Modes</a> &bull;
-    <a href="#external-judges">External Judges</a> &bull;
-    <a href="#output-schema">Output Schema</a>
-  </p>
+  <img src="seldon.png" alt="Seldon" width="200">
+  <br><br>
+  <em>Analyzes implementation plans the way Hari Seldon analyzed civilizations — by checking structural assumptions against reality before things go wrong.</em>
+  <br><br>
+  <a href="#install">Install</a> &bull;
+  <a href="#usage">Usage</a> &bull;
+  <a href="#focus-modes">Focus Modes</a> &bull;
+  <a href="#external-judges">External Judges</a> &bull;
+  <a href="#output-schema">Output Schema</a>
 </p>
 
 ---
