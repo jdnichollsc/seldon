@@ -3,6 +3,7 @@
   <br><br>
   <em>Analyzes implementation plans the way Hari Seldon analyzed civilizations — by checking structural assumptions against reality before things go wrong.</em>
   <br><br>
+  <a href="https://degrammer.github.io/seldon/">Slides</a> &bull;
   <a href="#install">Install</a> &bull;
   <a href="#usage">Usage</a> &bull;
   <a href="#focus-modes">Focus Modes</a> &bull;
@@ -18,15 +19,37 @@ Works out of the box as an inline skill for [Claude Code](https://docs.anthropic
 
 ## Install
 
-**Claude Code plugin (recommended):**
+### Claude Code plugin (recommended)
+
+Works with **Claude Code** (CLI) and **Claude Desktop** (Cowork). No API keys or config needed for inline review.
+
+**Option A — Download from GitHub:**
+
+1. Go to the [Releases](https://github.com/degrammer/seldon/releases) page
+2. Download the latest `seldon-*.zip`
+3. Install it:
 
 ```bash
-# Download and install the latest release
-gh release download --repo degrammer/seldon --pattern '*.zip'
-claude plugin install ./seldon-*.zip
+claude plugin install ./seldon-1.1.0.zip
 ```
 
-Or download the zip from the [Releases](https://github.com/degrammer/seldon/releases) page and run `claude plugin install ./seldon-*.zip`.
+**Option B — One-liner with `gh`:**
+
+```bash
+gh release download --repo degrammer/seldon --pattern '*.zip' && claude plugin install ./seldon-*.zip
+```
+
+**Option C — Claude Desktop (non-technical users):**
+
+1. Download the zip from [Releases](https://github.com/degrammer/seldon/releases)
+2. Open Claude Desktop
+3. Go to **Settings → Plugins → Install from file**
+4. Select the downloaded zip
+5. Type `/seldon my-plan.md` in any conversation
+
+After installing, the `/seldon` command is available in all your Claude sessions.
+
+### Other install methods
 
 **Via skills.sh:**
 
@@ -34,16 +57,13 @@ Or download the zip from the [Releases](https://github.com/degrammer/seldon/rele
 npx skills add degrammer/seldon
 ```
 
-**Manual:**
+**Manual (clone):**
 
 ```bash
-# Clone into your Claude Code skills directory
+# Global — available in all projects
 git clone https://github.com/degrammer/seldon.git ~/.claude/skills/seldon
-```
 
-**Project-level** (shared with your team):
-
-```bash
+# Project-level — shared with your team via git
 git clone https://github.com/degrammer/seldon.git .claude/skills/seldon
 ```
 
