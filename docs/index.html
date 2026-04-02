@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seldon — Independent Plan Review for AI Coding Agents</title>
+
+    <!-- Fonts: Young Serif (display) + Azeret Mono (body/code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Azeret+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Foundation-inspired: mathematical, predictive, elegant
+           =========================================== */
+        :root {
+            --bg-primary: #0b0e17;
+            --bg-card: #111827;
+            --bg-card-alt: #161d2e;
+            --text-primary: #e8e4df;
+            --text-secondary: #8892a4;
+            --text-muted: #5a6377;
+            --accent-gold: #d4a574;
+            --accent-amber: #e8b86d;
+            --accent-warm: #c48b5c;
+            --accent-red: #e85d5d;
+            --accent-green: #6dd4a0;
+            --accent-blue: #6da8d4;
+            --border: rgba(212, 165, 116, 0.12);
+            --glow-gold: rgba(212, 165, 116, 0.08);
+
+            --font-display: 'Young Serif', Georgia, serif;
+            --font-body: 'Azeret Mono', 'Courier New', monospace;
+
+            --title-size: clamp(2.2rem, 6vw, 5rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1rem, 2vw, 1.4rem);
+            --body-size: clamp(0.7rem, 1.3vw, 1rem);
+            --small-size: clamp(0.6rem, 0.9vw, 0.8rem);
+            --label-size: clamp(0.55rem, 0.8vw, 0.72rem);
+
+            --slide-padding: clamp(1.5rem, 5vw, 5rem);
+            --content-gap: clamp(0.75rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+            --duration-normal: 0.7s;
+            --duration-slow: 1.2s;
+        }
+
+        /* ===========================================
+           RESET
+           =========================================== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+        .card, .container, .content-box {
+            max-width: min(90vw, 1000px);
+            max-height: min(80vh, 700px);
+        }
+        .feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+        .feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+        img, .image-container {
+            max-width: 100%;
+            max-height: min(50vh, 400px);
+            object-fit: contain;
+        }
+
+        /* === RESPONSIVE BREAKPOINTS === */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.8rem);
+                --h2-size: clamp(1.1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.2rem, 4vw, 2rem);
+                --body-size: clamp(0.65rem, 1.1vw, 0.9rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.6rem, 1vw, 0.8rem);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.5rem, 8vw, 2.5rem); }
+            .grid { grid-template-columns: 1fr; }
+            .two-col { flex-direction: column !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           GLOBAL STYLES
+           =========================================== */
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: var(--body-size);
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            line-height: 1.15;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.15s; }
+        .reveal:nth-child(3) { transition-delay: 0.25s; }
+        .reveal:nth-child(4) { transition-delay: 0.35s; }
+        .reveal:nth-child(5) { transition-delay: 0.45s; }
+        .reveal:nth-child(6) { transition-delay: 0.55s; }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity 0.8s var(--ease-out-expo),
+                        transform 0.8s var(--ease-out-expo);
+        }
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===========================================
+           BACKGROUND EFFECTS
+           =========================================== */
+        .grid-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(212, 165, 116, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 165, 116, 0.03) 1px, transparent 1px);
+            background-size: clamp(30px, 5vw, 60px) clamp(30px, 5vw, 60px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .radial-glow::after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 10%;
+            right: -10%;
+            background: radial-gradient(ellipse, var(--glow-gold) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .slide-content { position: relative; z-index: 1; }
+
+        /* ===========================================
+           NAVIGATION
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent-gold);
+            z-index: 1000;
+            transition: width 0.3s var(--ease-out-quart);
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.75rem, 2vw, 1.5rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vh, 10px);
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+        .nav-dot.active {
+            background: var(--accent-gold);
+            box-shadow: 0 0 8px var(--glow-gold);
+            transform: scale(1.4);
+        }
+
+        /* ===========================================
+           SLIDE: TITLE
+           =========================================== */
+        .title-slide {
+            background:
+                radial-gradient(ellipse at 70% 30%, rgba(212, 165, 116, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(109, 168, 212, 0.04) 0%, transparent 50%),
+                var(--bg-primary);
+        }
+
+        .title-slide .slide-content {
+            align-items: center;
+            text-align: center;
+            gap: var(--content-gap);
+        }
+
+        .title-label {
+            font-size: var(--label-size);
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            opacity: 0.8;
+        }
+
+        .title-main {
+            font-size: var(--title-size);
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .title-sub {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            max-width: min(70ch, 80vw);
+            line-height: 1.7;
+        }
+
+        .title-separator {
+            width: clamp(40px, 6vw, 80px);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        .title-meta {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* ===========================================
+           SLIDE: CONTENT
+           =========================================== */
+        .content-slide .slide-content {
+            gap: var(--content-gap);
+        }
+
+        .slide-number {
+            font-family: var(--font-display);
+            font-size: var(--small-size);
+            color: var(--accent-gold);
+            opacity: 0.6;
+            letter-spacing: 0.1em;
+        }
+
+        .slide-heading {
+            font-size: var(--h2-size);
+            color: var(--text-primary);
+            max-width: min(50ch, 85vw);
+        }
+
+        .slide-body {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: min(65ch, 85vw);
+        }
+
+        /* ===========================================
+           PROBLEM CARDS
+           =========================================== */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.5rem, 1.5vw, 1.25rem);
+            max-width: min(90vw, 900px);
+        }
+        @media (max-width: 700px) {
+            .problem-grid { grid-template-columns: 1fr; }
+        }
+
+        .problem-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: clamp(6px, 0.8vw, 12px);
+            padding: clamp(0.75rem, 2vw, 1.5rem);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.3rem, 0.8vw, 0.6rem);
+        }
+
+        .problem-card .icon {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            line-height: 1;
+        }
+
+        .problem-card h3 {
+            font-size: var(--h3-size);
+            color: var(--text-primary);
+        }
+
+        .problem-card p {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===========================================
+           FLOW DIAGRAM (LLM as Judge)
+           =========================================== */
+        .flow-container {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.4rem, 1.2vw, 1rem);
+            max-width: min(90vw, 880px);
+            flex-wrap: nowrap;
+        }
+        @media (max-width: 700px) {
+            .flow-container {
+                flex-direction: column;
+            }
+            .flow-arrow { transform: rotate(90deg) !important; }
+        }
+
+        .flow-box {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: clamp(6px, 0.8vw, 12px);
+            padding: clamp(0.6rem, 1.5vw, 1.25rem);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.2rem, 0.5vw, 0.4rem);
+            min-width: 0;
+        }
+
+        .flow-box .step-num {
+            font-family: var(--font-display);
+            font-size: var(--label-size);
+            color: var(--accent-gold);
+            opacity: 0.7;
+        }
+
+        .flow-box h3 {
+            font-size: clamp(0.75rem, 1.3vw, 1rem);
+            color: var(--text-primary);
+        }
+
+        .flow-box p {
+            font-size: var(--label-size);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .flow-arrow {
+            color: var(--accent-gold);
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+            flex-shrink: 0;
+            opacity: 0.5;
+        }
+
+        /* ===========================================
+           VERDICT BAR (confidence visualization)
+           =========================================== */
+        .verdict-demo {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: clamp(6px, 0.8vw, 12px);
+            padding: clamp(0.75rem, 2vw, 1.5rem);
+            max-width: min(85vw, 600px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 1vw, 0.8rem);
+            font-family: var(--font-body);
+        }
+
+        .verdict-label {
+            font-size: var(--small-size);
+            color: var(--accent-gold);
+            font-weight: 500;
+        }
+
+        .confidence-bar {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.3rem, 0.8vw, 0.6rem);
+            font-size: var(--small-size);
+        }
+
+        .bar-track {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .bar-segment {
+            height: clamp(8px, 1.5vh, 14px);
+            flex: 1;
+            border-radius: 2px;
+            background: var(--text-muted);
+            opacity: 0.15;
+            transition: opacity 0.4s ease, background 0.4s ease;
+        }
+
+        .bar-segment.filled {
+            background: var(--accent-gold);
+            opacity: 1;
+        }
+
+        .bar-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            min-width: 3ch;
+        }
+
+        .verdict-text {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===========================================
+           MODEL DIVERSITY (why different providers)
+           =========================================== */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.5rem, 1.5vw, 1.25rem);
+            max-width: min(90vw, 900px);
+        }
+        @media (max-width: 700px) {
+            .model-grid { grid-template-columns: 1fr; }
+        }
+
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: clamp(6px, 0.8vw, 12px);
+            padding: clamp(0.75rem, 2vw, 1.5rem);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.3rem, 0.8vw, 0.6rem);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+
+        .model-card.claude::before { background: linear-gradient(90deg, #d4a574, #e8b86d); }
+        .model-card.openai::before { background: linear-gradient(90deg, #6dd4a0, #6da8d4); }
+        .model-card.codex::before { background: linear-gradient(90deg, #6da8d4, #a08cd4); }
+
+        .model-card .provider {
+            font-size: var(--label-size);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .model-card.claude .provider { color: var(--accent-gold); }
+        .model-card.openai .provider { color: var(--accent-green); }
+        .model-card.codex .provider { color: var(--accent-blue); }
+
+        .model-card h3 {
+            font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+            color: var(--text-primary);
+        }
+
+        .model-card p {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===========================================
+           INSTALL BLOCK
+           =========================================== */
+        .install-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: clamp(6px, 0.8vw, 12px);
+            padding: clamp(0.75rem, 2vw, 1.5rem);
+            max-width: min(85vw, 550px);
+            font-family: var(--font-body);
+        }
+
+        .install-block code {
+            display: block;
+            font-size: var(--body-size);
+            color: var(--accent-gold);
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        .install-block .comment {
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           CLOSING SLIDE
+           =========================================== */
+        .closing-slide .slide-content {
+            align-items: center;
+            text-align: center;
+            gap: var(--content-gap);
+        }
+
+        .closing-quote {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 2.5vw, 1.6rem);
+            color: var(--text-secondary);
+            font-style: italic;
+            max-width: min(55ch, 80vw);
+            line-height: 1.6;
+        }
+
+        .closing-attr {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           ANIMATED ACCENT LINE
+           =========================================== */
+        @keyframes accent-pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .accent-line {
+            position: absolute;
+            left: var(--slide-padding);
+            top: 15%;
+            bottom: 15%;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, var(--accent-gold), transparent);
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(0.5rem, 2vh, 1.5rem);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: var(--label-size);
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 1s ease 2s;
+            z-index: 999;
+            letter-spacing: 0.1em;
+        }
+        .keyboard-hint.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+    <!-- Keyboard hint -->
+    <div class="keyboard-hint" id="keyboardHint">&#8595; scroll or arrow keys</div>
+
+    <!-- ================================================
+         SLIDE 1: TITLE
+         ================================================ -->
+    <section class="slide title-slide grid-bg radial-glow" aria-label="Title">
+        <div class="slide-content">
+            <span class="title-label reveal">Claude Code Plugin</span>
+            <h1 class="title-main reveal">Seldon</h1>
+            <div class="title-separator reveal"></div>
+            <p class="title-sub reveal">
+                Independent plan review for AI coding agents.<br>
+                Check structural assumptions against reality before things go wrong.
+            </p>
+            <span class="title-meta reveal">degrammer/seldon</span>
+        </div>
+    </section>
+
+    <!-- ================================================
+         SLIDE 2: THE PROBLEM
+         ================================================ -->
+    <section class="slide content-slide grid-bg" aria-label="The Problem">
+        <div class="accent-line decorative"></div>
+        <div class="slide-content">
+            <span class="slide-number reveal">01</span>
+            <h2 class="slide-heading reveal">Plans fail silently</h2>
+            <p class="slide-body reveal">
+                AI agents generate confident, detailed implementation plans. But confidence is not correctness.
+            </p>
+            <div class="problem-grid">
+                <div class="problem-card reveal">
+                    <span class="icon">&#x2298;</span>
+                    <h3>Phantom files</h3>
+                    <p>Plans reference APIs, schemas, or migrations that don't exist in the workspace.</p>
+                </div>
+                <div class="problem-card reveal">
+                    <span class="icon">&#x21C4;</span>
+                    <h3>Broken sequencing</h3>
+                    <p>Step 3 depends on Step 5. Prerequisites are assumed, never verified.</p>
+                </div>
+                <div class="problem-card reveal">
+                    <span class="icon">&#x26A0;</span>
+                    <h3>Blind spots</h3>
+                    <p>The agent that wrote the plan can't objectively evaluate its own assumptions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         SLIDE 3: WHAT SELDON DOES
+         ================================================ -->
+    <section class="slide content-slide grid-bg" aria-label="What Seldon Does">
+        <div class="accent-line decorative"></div>
+        <div class="slide-content">
+            <span class="slide-number reveal">02</span>
+            <h2 class="slide-heading reveal">Review before you build</h2>
+            <p class="slide-body reveal">
+                Feed Seldon a plan. It reads the document, inspects your codebase for evidence, and returns a structured verdict.
+            </p>
+            <div class="verdict-demo reveal-scale">
+                <span class="verdict-label">approve_with_changes</span>
+                <div class="confidence-bar">
+                    <span style="color: var(--text-secondary)">Confidence</span>
+                    <div class="bar-track" id="confidenceBar"></div>
+                    <span class="bar-value" id="confidenceValue">0.00</span>
+                </div>
+                <p class="verdict-text">
+                    Plan is sound but assumes a migration path that doesn't exist yet.
+                    <span style="color: var(--accent-gold);">&#8594;</span>
+                    No v3 migration file in prisma/migrations/
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         SLIDE 4: HOW LLM-AS-JUDGE WORKS
+         ================================================ -->
+    <section class="slide content-slide grid-bg" aria-label="LLM as Judge">
+        <div class="accent-line decorative"></div>
+        <div class="slide-content">
+            <span class="slide-number reveal">03</span>
+            <h2 class="slide-heading reveal">LLM as Judge</h2>
+            <p class="slide-body reveal">
+                A second model reads the plan, verifies claims against the workspace, and scores against a rubric &mdash; independently from the agent that authored it.
+            </p>
+            <div class="flow-container">
+                <div class="flow-box reveal">
+                    <span class="step-num">01</span>
+                    <h3>Ingest plan</h3>
+                    <p>Read plan file and any supporting docs</p>
+                </div>
+                <span class="flow-arrow reveal">&#x2192;</span>
+                <div class="flow-box reveal">
+                    <span class="step-num">02</span>
+                    <h3>Inspect workspace</h3>
+                    <p>Verify file paths, APIs, deps, schema</p>
+                </div>
+                <span class="flow-arrow reveal">&#x2192;</span>
+                <div class="flow-box reveal">
+                    <span class="step-num">03</span>
+                    <h3>Evaluate rubric</h3>
+                    <p>Score fit, correctness, sequencing, safety</p>
+                </div>
+                <span class="flow-arrow reveal">&#x2192;</span>
+                <div class="flow-box reveal">
+                    <span class="step-num">04</span>
+                    <h3>Structured verdict</h3>
+                    <p>JSON with findings, evidence, references</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         SLIDE 5: WHY MODEL DIVERSITY
+         ================================================ -->
+    <section class="slide content-slide grid-bg" aria-label="Model Diversity">
+        <div class="accent-line decorative"></div>
+        <div class="slide-content">
+            <span class="slide-number reveal">04</span>
+            <h2 class="slide-heading reveal">Why a different model provider</h2>
+            <p class="slide-body reveal">
+                The same model reviewing its own plan shares the same blind spots. Cross-provider review creates genuine independence.
+            </p>
+            <div class="model-grid">
+                <div class="model-card claude reveal">
+                    <span class="provider">Anthropic</span>
+                    <h3>Second opinion</h3>
+                    <p>A separate Claude instance reviews the plan. Same ecosystem, different context window and session.</p>
+                </div>
+                <div class="model-card openai reveal">
+                    <span class="provider">OpenAI</span>
+                    <h3>Different training</h3>
+                    <p>Different pretraining data and RLHF means different failure modes, different strengths. True blind spot coverage.</p>
+                </div>
+                <div class="model-card codex reveal">
+                    <span class="provider">Codex CLI</span>
+                    <h3>Full workspace access</h3>
+                    <p>Reads your codebase in a sandboxed environment. Schema-enforced structured output. The deepest review.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         SLIDE 6: GET STARTED
+         ================================================ -->
+    <section class="slide closing-slide grid-bg radial-glow" aria-label="Get Started">
+        <div class="slide-content">
+            <span class="slide-number reveal">05</span>
+            <h2 class="slide-heading reveal" style="text-align: center;">Get started</h2>
+            <div class="install-block reveal-scale">
+                <code><span class="comment"># install the plugin</span>
+claude plugin install seldon.zip
+
+<span class="comment"># review a plan</span>
+/seldon my-plan.md
+
+<span class="comment"># focus on architecture</span>
+/seldon --focus architecture spec.md</code>
+            </div>
+            <div class="title-separator reveal"></div>
+            <p class="closing-quote reveal">
+                "If you're seeing this, here's what you got wrong."
+            </p>
+            <span class="closing-attr reveal">&mdash; Hari Seldon, probably</span>
+            <span class="title-meta reveal" style="margin-top: clamp(0.5rem, 1vh, 1rem);">github.com/degrammer/seldon</span>
+        </div>
+    </section>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.isScrolling = false;
+
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+                this.setupConfidenceAnimation();
+
+                // Show keyboard hint briefly
+                const hint = document.getElementById('keyboardHint');
+                if (hint) {
+                    hint.classList.add('show');
+                    setTimeout(() => hint.classList.remove('show'), 5000);
+                }
+            }
+
+            /* --- Intersection Observer: trigger .visible --- */
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const idx = Array.from(this.slides).indexOf(entry.target);
+                            if (idx !== -1) {
+                                this.currentSlide = idx;
+                                this.updateProgressBar();
+                                this.updateNavDots();
+                            }
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            /* --- Keyboard: arrows, space, page up/down --- */
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    switch (e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.goTo(this.currentSlide + 1);
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.goTo(this.currentSlide - 1);
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goTo(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goTo(this.slides.length - 1);
+                            break;
+                    }
+                });
+            }
+
+            /* --- Touch / swipe --- */
+            setupTouchNav() {
+                let startY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const diff = startY - e.changedTouches[0].clientY;
+                    if (Math.abs(diff) > 50) {
+                        this.goTo(this.currentSlide + (diff > 0 ? 1 : -1));
+                    }
+                }, { passive: true });
+            }
+
+            /* --- Progress bar --- */
+            setupProgressBar() {
+                this.progressBar = document.getElementById('progressBar');
+                this.updateProgressBar();
+
+                window.addEventListener('scroll', () => {
+                    this.updateProgressBar();
+                }, { passive: true });
+            }
+
+            updateProgressBar() {
+                if (!this.progressBar) return;
+                const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
+                this.progressBar.style.width = pct + '%';
+            }
+
+            /* --- Nav dots --- */
+            setupNavDots() {
+                const container = document.getElementById('navDots');
+                if (!container) return;
+
+                this.slides.forEach((_, i) => {
+                    const dot = document.createElement('button');
+                    dot.classList.add('nav-dot');
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    if (i === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => this.goTo(i));
+                    container.appendChild(dot);
+                });
+            }
+
+            updateNavDots() {
+                const dots = document.querySelectorAll('.nav-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentSlide);
+                });
+            }
+
+            /* --- Navigate to slide --- */
+            goTo(index) {
+                if (index < 0 || index >= this.slides.length) return;
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+            }
+
+            /* --- Confidence bar animation --- */
+            setupConfidenceAnimation() {
+                const bar = document.getElementById('confidenceBar');
+                const val = document.getElementById('confidenceValue');
+                if (!bar || !val) return;
+
+                // Create 20 segments
+                for (let i = 0; i < 20; i++) {
+                    const seg = document.createElement('div');
+                    seg.classList.add('bar-segment');
+                    bar.appendChild(seg);
+                }
+
+                const segments = bar.querySelectorAll('.bar-segment');
+                const targetConfidence = 0.82;
+                const filledCount = Math.round(targetConfidence * 20);
+
+                // Animate when slide 3 becomes visible
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            let current = 0;
+                            const interval = setInterval(() => {
+                                if (current < filledCount) {
+                                    segments[current].classList.add('filled');
+                                    current++;
+                                    val.textContent = (current / 20).toFixed(2);
+                                } else {
+                                    clearInterval(interval);
+                                }
+                            }, 50);
+                            observer.disconnect();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                // Observe slide 3 (index 2)
+                if (this.slides[2]) observer.observe(this.slides[2]);
+            }
+        }
+
+        /* Initialize */
+        new SlidePresentation();
+    </script>
+</body>
+</html>

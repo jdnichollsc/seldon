@@ -21,12 +21,12 @@ Works out of the box as an inline skill for [Claude Code](https://docs.anthropic
 **Claude Code plugin (recommended):**
 
 ```bash
-# Download the latest release and install
-curl -sL https://github.com/degrammer/seldon/releases/latest/download/seldon-1.0.0.zip -o seldon.zip
-claude plugin install ./seldon.zip
+# Download and install the latest release
+gh release download --repo degrammer/seldon --pattern '*.zip'
+claude plugin install ./seldon-*.zip
 ```
 
-Or download from the [Releases](https://github.com/degrammer/seldon/releases) page and run `claude plugin install ./seldon-*.zip`.
+Or download the zip from the [Releases](https://github.com/degrammer/seldon/releases) page and run `claude plugin install ./seldon-*.zip`.
 
 **Via skills.sh:**
 
