@@ -21,6 +21,7 @@ jobs:
             .claude-plugin/ \
             skills/ \
             judges/ \
+            docs/ \
             seldon.schema.json \
             LICENSE \
             README.md

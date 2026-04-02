@@ -1,6 +1,6 @@
 {
   "name": "seldon",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Independent plan/spec reviewer for AI coding agents. Verifies claims against the workspace and returns structured verdicts with findings.",
   "author": {
     "name": "degrammer"
